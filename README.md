@@ -43,7 +43,7 @@
 - [2. VS Code Copilot과 무엇이 다른가](#2-vs-code-copilot과-무엇이-다른가)
 - [3. 주요 기능 한눈에](#3-주요-기능-한눈에)
 
-**② 실습편 — 따라하기** (약 45–60분, 준비물: Copilot 구독 · Node.js 22+)
+**② 실습편 — 따라하기** (약 90분, 준비물: Copilot 구독 · Node.js 22+)
 
 - [실습 0. 설치 · 인증 · 첫 실행](#실습-0-설치--인증--첫-실행)
 - [실습 1. 대화 · 파일 멘션 · 모드 전환](#실습-1-대화--파일-멘션--모드-전환)
@@ -53,6 +53,7 @@
 - [실습 5. 바이브 코딩 — 설정만으로 코드 생성·리뷰](#실습-5-바이브-코딩--설정만으로-코드-생성리뷰)
 - [실습 6. 자동화 — Plan · Autopilot · 서브에이전트 · 스케줄](#실습-6-자동화--plan--autopilot--서브에이전트--스케줄)
 - [실습 7. 가드레일(AGENTS.md)로 안전하게 커밋·PR](#실습-7-가드레일agentsmd로-안전하게-커밋pr)
+- [실습 8. 나만의 Custom Agent 만들기](#실습-8-나만의-custom-agent-만들기)
 
 **③ 레퍼런스편 — 찾아보기**
 
@@ -204,7 +205,7 @@ copilot
 
 ## 실습 1. 대화 · 파일 멘션 · 모드 전환
 
-> 🎯 대화·파일 멘션(`@`)·모드 전환을 익힌다 · ⏱️ 약 5분
+> 🎯 대화·파일 멘션(`@`)·모드 전환을 익힌다 · ⏱️ 약 10분
 
 세션 프롬프트에 자연어로 입력합니다.
 
@@ -235,8 +236,19 @@ copilot
 
 Plan 모드에서는 코드를 바꾸기 전에 **구현 계획**을 먼저 제안합니다.
 
-✅ **확인**: 파일 멘션(`@`)에 대한 한국어 설명을 받고, `Shift+Tab`으로 Plan↔Interactive를 오갈 수
-있으면 완료입니다.
+모델·추론 표시·이슈 멘션도 직접 바꿔 봅니다.
+
+```text
+> /model            # 모델 목록에서 다른 모델 선택 (auto 포함)
+# Ctrl+T 를 눌러 모델의 '추론 과정' 표시를 켜고 끕니다
+> #1 이 이슈 내용을 요약해줘       # 저장소에 이슈/PR이 있다면 번호로 멘션해 문맥에 포함
+```
+
+> 💡 `@`는 파일, `#`는 이슈/PR, `!`는 로컬 셸 명령을 가리킵니다. `!`로 시작하면 모델을 거치지 않고
+> 바로 실행되므로 `!git status` 같은 확인 작업이 빠릅니다.
+
+✅ **확인**: 파일 멘션(`@`)에 대한 한국어 설명을 받고, `Shift+Tab`으로 Plan↔Interactive를 오가며,
+`/model`로 모델을 한 번 바꿔 봤다면 완료입니다.
 
 ## 실습 2. `.github/` 설정으로 Copilot 조종하기
 
@@ -345,7 +357,7 @@ copilot --agent debugger                    # 환경/런타임 진단
 
 ## 실습 4. MCP로 외부 도구 연결
 
-> 🎯 MCP 서버를 연결해 외부 도구를 쓴다 · ⏱️ 약 5분
+> 🎯 MCP 서버를 연결해 외부 도구를 쓴다 · ⏱️ 약 10분
 
 **MCP(Model Context Protocol)** 서버를 붙이면 Copilot이 외부 시스템을 **도구**로 사용합니다. Copilot은
 **GitHub MCP를 기본 내장**하며, 이 저장소는 `.copilot/mcp-config.json`에 3개 서버를 추가로 설정합니다.
@@ -393,11 +405,20 @@ copilot
 > (실제 범위는 `az login` 계정의 RBAC로 제한되고 실행 전 승인을 받습니다). 읽기 전용만 노출하려면
 > `tools`를 도구명으로 좁히세요.
 
-✅ **확인**: `/mcp`에 서버가 `connected`로 보이면 완료입니다.
+인증이 필요 없는 `microsoftLearn` 서버로 실제 공식 문서를 검색해 봅니다.
+
+```text
+> Microsoft Learn에서 'Agent Framework Concurrent orchestration' 문서를 찾아 핵심을 한국어로 요약해줘
+```
+
+Copilot이 `microsoftLearn` MCP 도구를 호출해 공식 문서를 가져와 요약합니다(도구 호출 시 승인을 물을 수 있음).
+
+✅ **확인**: `/mcp`에 서버가 `connected`로 보이고, 위 요청에 Copilot이 Learn 문서를 검색해 요약하면
+완료입니다. (PAT·Azure 없이 `microsoftLearn`만으로 가능)
 
 ## 실습 5. 바이브 코딩 — 설정만으로 코드 생성·리뷰
 
-> 🎯 설정만으로 코드를 생성·리뷰한다(바이브 코딩) · ⏱️ 약 10분
+> 🎯 설정만으로 코드를 생성·리뷰한다(바이브 코딩) · ⏱️ 약 15분
 
 **바이브 코딩**은 손으로 코드를 쓰는 대신 `.github/` 설정(instructions·prompts·skills)으로 의도를
 정의하고 Copilot이 코드를 생성하게 하는 방식입니다.
@@ -418,6 +439,7 @@ copilot
 > 동시 워크플로우(04_concurrent_workflow.py)에 '비용' 리뷰 전문 에이전트를 추가해줘
 > /diff                                  # 변경 확인 — 비용 리뷰어 Agent + ConcurrentBuilder participants에 추가됨
 > reviewer 에이전트로 방금 변경을 검토해줘
+> 리뷰에서 지적된 부분을 반영해서 수정해줘   # 생성 → 리뷰 → 수정 사이클을 한 바퀴 돌려 봅니다
 ```
 
 (선택, Python 설치 시) 문법만 검증 — Azure 불필요:
@@ -491,10 +513,58 @@ git push --force-with-lease origin <branch>     # force push
 ✅ **확인**: 기능 브랜치에서 영문 Conventional Commits로 커밋하고 `--draft --base main`으로 PR을 만들
 수 있으면 완료입니다. Copilot에게 커밋/PR을 맡겨도 이 가드레일을 따릅니다.
 
+## 실습 8. 나만의 Custom Agent 만들기
+
+> 🎯 직접 정의한 커스텀 에이전트를 만들고 실행한다 · ⏱️ 약 15분
+
+[Custom Agent·Skill 만들기](#custom-agentskill-만들기)의 형식대로 `.github/agents/`에 나만의 에이전트를
+추가해 봅니다. 기존 7개와 겹치지 않는 이름(예: `doc_writer`)을 씁니다.
+
+**1) 에이전트 파일을 만듭니다** — Copilot에게 맡겨도 되고, 직접 작성해도 됩니다.
+
+```text
+> .github/agents/doc_writer.agent.md 를 만들어줘. 역할은 "파이썬 함수에 한국어 Google 스타일
+  docstring을 추가하는 문서화 전문가"이고, tools 는 read·edit 만 허용해줘.
+```
+
+직접 작성한다면 다음과 같이 합니다(파일명에서 `.agent.md`를 뺀 부분이 에이전트 이름).
+
+```markdown
+---
+name: doc_writer
+description: 파이썬 함수에 한국어 Google 스타일 docstring을 추가하는 문서화 전문가
+tools: [read, edit]
+---
+
+# Doc Writer
+## 역할 (Role)
+파이썬 함수·클래스에 한국어 Google 스타일 docstring(설명/Args/Returns)을 추가합니다.
+## 규칙 (Rules)
+1. 기존 동작·시그니처는 절대 바꾸지 않습니다.
+2. 주석·docstring은 한국어로 작성합니다.
+## 워크플로우 (Workflow)
+1. 대상 파일을 읽고 → 2. docstring을 추가하고 → 3. 변경을 요약합니다.
+```
+
+**2) 만든 에이전트를 실행합니다.**
+
+```bash
+copilot --agent doc_writer
+> @src/01_single_agent.py 의 함수들에 docstring을 추가해줘
+```
+
+**3) `/diff`로 변경을 확인합니다.** `tools: [read, edit]`로 제한했으므로 셸 명령 실행은 시도하지 않습니다 —
+도구 권한을 좁히면 에이전트가 할 수 있는 일도 좁아진다는 것을 직접 확인할 수 있습니다.
+
+✅ **확인**: `/agent` 목록(또는 `--agent doc_writer`)에 새 에이전트가 나타나고, 지정한 역할대로만
+동작하면 완료입니다. **마크다운 파일 하나로 전용 에이전트를 정의**할 수 있다는 것을 확인한 것입니다.
+
+> 🧹 실습용으로 만든 `.github/agents/doc_writer.agent.md`는 커밋하지 않을 거면 삭제해도 됩니다.
+
 ### 🎉 실습편 완료 — 다음 단계
 
-여기까지 따라왔다면 Copilot CLI의 핵심 흐름(설치·인증 → 설정으로 조종 → 에이전트·MCP → 바이브
-코딩 → 자동화 → 가드레일)을 한 번씩 경험한 것입니다. 이제:
+여기까지 따라왔다면(약 90분) Copilot CLI의 핵심 흐름(설치·인증 → 설정으로 조종 → 에이전트·MCP →
+바이브 코딩 → 자동화 → 가드레일 → 나만의 에이전트 만들기)을 한 번씩 경험한 것입니다. 이제:
 
 - 전체 슬래시 커맨드·단축키·플래그·설정은 [③ 레퍼런스편](#슬래시-커맨드-전체)에서 찾아보세요.
 - 나만의 에이전트·스킬을 만들려면 [Custom Agent·Skill 만들기](#custom-agentskill-만들기)를 보세요.
