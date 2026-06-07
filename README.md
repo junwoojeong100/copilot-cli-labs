@@ -874,53 +874,94 @@ model: auto                                         # 선택
 ## src 예제 코드를 만드는 프롬프트 모음
 
 `src/`의 예제는 모두 **바이브 코딩**으로 다시 만들 수 있습니다. 이 저장소의 `.github/` 설정
-(instructions · `agent-framework-codegen` 스킬)이 import 경로 · `async/await` · 스트리밍 ·
-한국어 `instructions` 규칙을 자동 주입하므로, 아래 프롬프트를 `copilot` 세션에서 위에서 아래로
-실행하면 현재와 같은 예제가 생성됩니다. (모델 출력이라 세부 문구는 조금씩 다를 수 있습니다.)
+(instructions · `agent-framework-codegen` 스킬)이 **공통 골격**(import 경로 · `async/await` ·
+`.env` 로딩 · `PROJECT_ENDPOINT` 누락 시 한국어 오류 후 `sys.exit(1)` · 스트리밍 · 한국어
+`instructions`)을 자동으로 채워 줍니다. 그래서 프롬프트에는 **각 예제 고유의 내용**(에이전트
+이름·역할, 시나리오 입력, 패턴별 설정값)만 구체적으로 적으면 됩니다. 아래 프롬프트를 `copilot`
+세션에서 위에서 아래로 실행하면 현재 파일과 가깝게 재현됩니다. (모델 출력이라 세부 구현·문구는
+조금씩 다를 수 있습니다. 더 똑같이 만들려면 해당 `src/*.py`를 함께 첨부해 "이 파일처럼"이라고
+지시하세요.)
 
-> 💡 스트리밍 출력 공용 헬퍼 `_streaming.py`(모든 예제 공유)와 Foundry IQ 공용 헬퍼 `_rag_iq.py`
-> (7번 변형 전용)는 해당 헬퍼를 처음 `import`하는 예제를 만들 때 함께 생성됩니다.
+> 💡 아래 각 코드 블록은 **한 번에 입력하는 하나의 프롬프트**입니다(`>`는 프롬프트 시작 표시, `-`
+> 줄은 같은 프롬프트에 포함되는 요구사항). 스트리밍 헬퍼 `_streaming.py`(전 예제 공유)와 Foundry IQ
+> 헬퍼 `_rag_iq.py`(7번 전용)는 이를 처음 `import`하는 예제를 만들 때 함께 생성됩니다.
 
 **1. 단일 에이전트** → `src/01_single_agent.py`
 
 ```text
-> src/01_single_agent.py를 만들어줘. FoundryChatClient로 연결한 한국어 기술 어시스턴트가 "Microsoft Agent Framework가 무엇인가요?"에 stream_agent로 토큰 단위 스트리밍 답변하게 해줘.
+> src/01_single_agent.py를 만들어줘. 요구사항:
+- FoundryChatClient(project_endpoint, model=MODEL_DEPLOYMENT_NAME, credential=AzureCliCredential)로 Foundry에 연결
+- 에이전트 이름은 "기술_어시스턴트", 역할은 Microsoft 기술 전문 어시스턴트로서 기술 질문에 정확하고 이해하기 쉽게, 간결하지만 핵심을 담아 한국어로 답변
+- 질문 "Microsoft Agent Framework가 무엇인가요?"를 던지고, _streaming의 stream_agent로 응답을 토큰 단위로 스트리밍 출력
+- 클라이언트 초기화가 실패하면 az login 상태를 확인하라는 한국어 안내를 출력
 ```
 
 **2. 순차(Sequential) 워크플로우** → `src/02_sequential_workflow.py`
 
 ```text
-> src/02_sequential_workflow.py를 만들어줘. 분석가 → 작가 → 편집자 에이전트를 SequentialBuilder로 연결한 콘텐츠 제작 파이프라인을 구성하고 stream_workflow로 출력해줘.
+> src/02_sequential_workflow.py를 만들어줘. 분석가 → 작가 → 편집자로 이어지는 콘텐츠 제작 파이프라인이야. 요구사항:
+- 분석가: 주제의 핵심 논점 3가지를 간결히 정리
+- 작가: 앞 단계 분석을 바탕으로 400자 이내 글 초안 작성
+- 편집자: 초안의 논리 흐름·가독성을 다듬어 최종본 작성
+- 세 에이전트를 SequentialBuilder(participants=[분석가, 작가, 편집자])로 연결
+- 입력 주제는 "Kubernetes 클러스터 비용 최적화 전략", 결과는 stream_workflow로 출력
 ```
 
 **3. GroupChat 워크플로우** → `src/03_group_chat.py`
 
 ```text
-> src/03_group_chat.py를 만들어줘. 기획자·개발자·디자이너 에이전트가 GroupChatBuilder로 신규 기능을 협업 토론하게 하고, 라운드 로빈 selection_func과 max_rounds로 무한 토론을 막은 뒤 stream_workflow로 출력해줘.
+> src/03_group_chat.py를 만들어줘. 기획자·개발자·디자이너가 함께 토론하는 GroupChat이야. 요구사항:
+- 기획자(시니어 PM): 비즈니스 가치·사용자 요구·시장 트렌드 관점에서 기획
+- 개발자(시니어 풀스택): 기술적 실현 가능성·아키텍처와 Azure/AI 활용 방안 제시
+- 디자이너(시니어 UX/UI): 사용자 경험·인터페이스·접근성 관점 제시
+- 발화자 선택은 participants 삽입 순서 기준 라운드 로빈 selection_func(state.current_round 사용)
+- GroupChatBuilder(participants, selection_func, max_rounds=6)로 구성하고 stream_workflow로 출력
+- 주제는 "모바일 앱 신규 기능 기획: AI 기반 개인화 추천 시스템 도입"
 ```
 
 **4. 동시(Concurrent) 워크플로우** → `src/04_concurrent_workflow.py`
 
 ```text
-> src/04_concurrent_workflow.py를 만들어줘. 보안·성능·UX 리뷰어 에이전트가 같은 설계안을 ConcurrentBuilder로 병렬 검토하고 결과를 stream_workflow로 출력하게 해줘.
+> src/04_concurrent_workflow.py를 만들어줘. 보안·성능·UX 리뷰어가 같은 설계안을 동시에 검토하는 패턴이야. 요구사항:
+- 보안 리뷰어: 보안 위험과 완화 방안을 핵심만 평가
+- 성능 리뷰어: 성능 병목과 확장성 개선점을 핵심만 평가
+- UX 리뷰어: 사용성과 접근성 개선점을 핵심만 평가
+- 세 에이전트를 ConcurrentBuilder(participants=[...])로 병렬 실행하고 stream_workflow로 출력
+- 검토 대상 설계안은 "로그인 없이 게스트 결제를 허용하고 추천 데이터를 단말에 캐시하는 신규 모바일 앱"
 ```
 
 **5. MCP 도구 연동** → `src/05_mcp_agent.py`
 
 ```text
-> src/05_mcp_agent.py를 만들어줘. MCPStreamableHTTPTool로 인증이 필요 없는 Microsoft Learn MCP(https://learn.microsoft.com/api/mcp)에 연결해, async with 안에서 에이전트가 공식 문서를 검색해 출처와 함께 답하도록 tools로 연결하고 stream_agent로 출력해줘.
+> src/05_mcp_agent.py를 만들어줘. MCP 서버를 도구로 붙인 에이전트야. 요구사항:
+- MCPStreamableHTTPTool(name="MicrosoftLearn", url="https://learn.microsoft.com/api/mcp")로 인증이 필요 없는 공개 MCP 서버에 연결
+- async with로 MCP 세션을 연 뒤 그 안에서 에이전트에 tools로 연결
+- 에이전트 "문서_리서치_어시스턴트": 답하기 전에 MicrosoftLearn으로 공식 문서를 검색해 근거를 확보하고, 출처를 함께 제시하며 한국어로 답변(추측 금지)
+- 질문은 "Microsoft Agent Framework의 Handoff 방식이 무엇인지 공식 문서를 근거로 설명"
+- 응답은 stream_agent로 스트리밍 출력
 ```
 
 **6. RAG — Azure AI Search 하이브리드** → `src/06_rag_agent.py`
 
 ```text
-> src/06_rag_agent.py를 만들어줘. Azure AI Search 하이브리드(키워드+벡터) 검색으로 지식 베이스를 찾아 컨텍스트로 주입한 뒤 에이전트가 근거 기반으로 답하게 하고, 인덱스 생성·임베딩 업로드까지 멱등하게 자체 처리해줘. 임베딩은 Azure OpenAI, 인증은 키리스(AzureCliCredential)로.
+> src/06_rag_agent.py를 만들어줘. Azure AI Search 하이브리드(키워드 BM25 + 벡터, RRF 융합) 검색 기반 RAG야. 요구사항:
+- 지식 베이스는 한국어 문서 4건(환불 정책, 구독 요금제, 기술 지원 SLA, 계정 보안)
+- 인덱스가 없으면 키리스로 생성: id/title/content + content_vector, title·content는 ko.microsoft 분석기, HNSW 코사인, 벡터 차원은 임베딩 모델 실제 출력으로 동적 결정
+- 문서를 Azure OpenAI 임베딩(키리스 AAD)으로 임베딩해 merge_or_upload로 멱등 시드하고, 인덱싱 반영을 문서 수로 폴링
+- 질문 "Pro 요금제는 얼마이고 기술 지원은 얼마나 빨리 받을 수 있나요?"로 top_k=2 하이브리드 검색 → 컨텍스트 주입
+- 에이전트 "고객지원_RAG_어시스턴트": 제공된 참고 문서 안의 정보로만 한국어로 답변하고, 없으면 모른다고 답한 뒤 답변 끝에 [출처: 문서제목] 표기
+- 필요 env: PROJECT_ENDPOINT, SEARCH_SERVICE_ENDPOINT, AZURE_OPENAI_ENDPOINT, EMBEDDING_DEPLOYMENT_NAME. 최종 답변은 stream_agent로 출력
 ```
 
 **7. RAG (Foundry IQ 변형) — agentic retrieval** → `src/06_rag_agent_foundry_iq.py`
 
 ```text
-> src/06_rag_agent_foundry_iq.py를 만들어줘. 06번과 같은 지식 베이스를 Foundry IQ(지식 베이스 + agentic retrieval)에 올리고, 검색을 직접 코딩하는 대신 AzureAISearchContextProvider(agentic 모드)에 위임해 멀티홉 검색 결과가 before_run 훅으로 자동 주입되게 해줘. 공용 로직은 _rag_iq.py로 분리해줘.
+> src/06_rag_agent_foundry_iq.py를 만들어줘. 06번과 같은 지식 베이스를 Foundry IQ(지식 베이스 + agentic retrieval)에 위임하는 변형이야. 요구사항:
+- 검색·증강을 직접 코딩하지 말고 agent_framework.azure의 AzureAISearchContextProvider(agentic 모드)에 위임 — before_run 훅에서 멀티홉 검색 결과를 세션 컨텍스트에 자동 주입
+- 인덱스는 기본 semantic 구성과 함께 생성(agentic retrieval 필수 요건), 하이브리드 예제와 충돌하지 않게 별도 인덱스명(기본 maf-lab-knowledge-iq-v1) 사용
+- 지식 베이스 model에는 임베딩이 아니라 채팅 모델 배포명(gpt-5.x)을 전달하고, 문서 임베딩은 EMBEDDING_DEPLOYMENT_NAME으로 시드 단계에서 수행
+- 컨텍스트 프로바이더는 비동기 자격 증명, 시드·채팅 클라이언트는 동기 자격 증명을 사용
+- 시드·프로바이더 구성·env 해석 같은 공용 로직은 _rag_iq.py로 분리하고, 최종 답변은 stream_agent로 출력
 ```
 
 > 🔍 생성 후에는 `/diff`로 변경을 확인하고 `copilot --agent reviewer`로 규칙(import 경로 · async ·
