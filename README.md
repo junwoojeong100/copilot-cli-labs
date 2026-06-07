@@ -5,8 +5,7 @@
 > Copilot Chat(Ask/Edit/Agent 모드)과 무엇이 다른지도 함께 다룹니다.
 >
 > 이 저장소의 `.github/` 설정과 `src/`의 Microsoft Agent Framework 예제를 **실습 대상**으로 사용합니다.
-> **Azure 리소스나 Python 실행 없이도** 가이드를 완주할 수 있으며, 별도의
-> [Microsoft Agent Framework 핸즈온 랩](https://github.com/junwoojeong100/agent-framework-labs)과는 독립적입니다.
+> **Azure 리소스나 Python 실행 없이도** 가이드를 완주할 수 있습니다.
 
 이 문서는 세 부분입니다. **① 개념편**으로 무엇인지 이해하고 → **② 실습편**을 위에서 아래로 따라 하며
 손에 익히고 → 필요할 때 **③ 레퍼런스편**에서 전체 기능을 찾아보세요.
@@ -67,8 +66,8 @@
 
 - [트러블슈팅](#트러블슈팅)
 - [더 알아보기](#더-알아보기)
-- [예제 코드를 실제로 실행하고 싶다면](#예제-코드를-실제로-실행하고-싶다면)
 - [프로젝트 구조](#프로젝트-구조)
+- [src 예제 코드를 만드는 프롬프트 모음](#src-예제-코드를-만드는-프롬프트-모음)
 
 ---
 
@@ -480,7 +479,7 @@ python3 -m py_compile src/04_concurrent_workflow.py   # 오류 없으면 아무 
 ```
 
 ✅ **확인**: `.github/` 설정만으로 규칙에 맞는 새 에이전트 코드를 생성·리뷰하게 만들 수 있으면 이
-실습의 목표를 달성한 것입니다. (실제 실행은 선택 — [예제 실행](#예제-코드를-실제로-실행하고-싶다면))
+실습의 목표를 달성한 것입니다.
 
 ## 실습 6. 자동화 — Plan · Autopilot · 서브에이전트 · 스케줄
 
@@ -604,7 +603,7 @@ copilot --agent doc_writer
 
 - 전체 슬래시 커맨드·단축키·플래그·설정은 [③ 레퍼런스편](#슬래시-커맨드-전체)에서 찾아보세요.
 - 나만의 에이전트·스킬을 만들려면 [Custom Agent·Skill 만들기](#custom-agentskill-만들기)를 보세요.
-- 생성한 코드를 실제로 실행하려면 [예제 코드를 실제로 실행하고 싶다면](#예제-코드를-실제로-실행하고-싶다면)을 참고하세요.
+- `src/` 예제를 자연어 프롬프트만으로 다시 만들어 보려면 [src 예제 코드를 만드는 프롬프트 모음](#src-예제-코드를-만드는-프롬프트-모음)을 참고하세요.
 
 ---
 
@@ -851,26 +850,6 @@ model: auto                                         # 선택
   Copilot 구독 계정을 분리해 사용하는 방법
 - 세션에서 `copilot help config` · `copilot help environment` · `copilot help permissions`로 추가 정보 확인
 
-## 예제 코드를 실제로 실행하고 싶다면
-
-`src/`의 Microsoft Agent Framework 예제는 이 가이드에서 **바이브 코딩의 대상(예시 도메인)** 으로
-포함됩니다. 생성·수정한 코드를 **실제로 실행**해 보려면 Azure·Python 환경이 필요합니다. 이 저장소만으로
-최소 실행하려면 다음 순서로 준비합니다.
-
-```bash
-python3 -m venv .venv && source .venv/bin/activate
-python3 -m pip install -r requirements.txt
-
-cp .env.example .env
-# .env에서 PROJECT_ENDPOINT·MODEL_DEPLOYMENT_NAME을 실제 Foundry 값으로 수정
-az login
-
-python3 src/04_concurrent_workflow.py   # 실제 실행 (Azure·Python 필요, 선택)
-```
-
-Azure/Microsoft Foundry 리소스 준비 등 자세한 사전 준비는
-**[Microsoft Agent Framework 핸즈온 랩](https://github.com/junwoojeong100/agent-framework-labs)** 을 참고하세요.
-
 ## 프로젝트 구조
 
 ```
@@ -891,6 +870,62 @@ Azure/Microsoft Foundry 리소스 준비 등 자세한 사전 준비는
 ├── docs/                           # GitHub 멀티 계정 설정 가이드
 └── src/                            # 바이브 코딩 예시 도메인 (Microsoft Agent Framework 예제)
 ```
+
+## src 예제 코드를 만드는 프롬프트 모음
+
+`src/`의 예제는 모두 **바이브 코딩**으로 다시 만들 수 있습니다. 이 저장소의 `.github/` 설정
+(instructions · `agent-framework-codegen` 스킬)이 import 경로 · `async/await` · 스트리밍 ·
+한국어 `instructions` 규칙을 자동 주입하므로, 아래 프롬프트를 `copilot` 세션에서 위에서 아래로
+실행하면 현재와 같은 예제가 생성됩니다. (모델 출력이라 세부 문구는 조금씩 다를 수 있습니다.)
+
+> 💡 스트리밍 출력 공용 헬퍼 `_streaming.py`(모든 예제 공유)와 Foundry IQ 공용 헬퍼 `_rag_iq.py`
+> (7번 변형 전용)는 해당 헬퍼를 처음 `import`하는 예제를 만들 때 함께 생성됩니다.
+
+**1. 단일 에이전트** → `src/01_single_agent.py`
+
+```text
+> src/01_single_agent.py를 만들어줘. FoundryChatClient로 연결한 한국어 기술 어시스턴트가 "Microsoft Agent Framework가 무엇인가요?"에 stream_agent로 토큰 단위 스트리밍 답변하게 해줘.
+```
+
+**2. 순차(Sequential) 워크플로우** → `src/02_sequential_workflow.py`
+
+```text
+> src/02_sequential_workflow.py를 만들어줘. 분석가 → 작가 → 편집자 에이전트를 SequentialBuilder로 연결한 콘텐츠 제작 파이프라인을 구성하고 stream_workflow로 출력해줘.
+```
+
+**3. GroupChat 워크플로우** → `src/03_group_chat.py`
+
+```text
+> src/03_group_chat.py를 만들어줘. 기획자·개발자·디자이너 에이전트가 GroupChatBuilder로 신규 기능을 협업 토론하게 하고, 라운드 로빈 selection_func과 max_rounds로 무한 토론을 막은 뒤 stream_workflow로 출력해줘.
+```
+
+**4. 동시(Concurrent) 워크플로우** → `src/04_concurrent_workflow.py`
+
+```text
+> src/04_concurrent_workflow.py를 만들어줘. 보안·성능·UX 리뷰어 에이전트가 같은 설계안을 ConcurrentBuilder로 병렬 검토하고 결과를 stream_workflow로 출력하게 해줘.
+```
+
+**5. MCP 도구 연동** → `src/05_mcp_agent.py`
+
+```text
+> src/05_mcp_agent.py를 만들어줘. MCPStreamableHTTPTool로 인증이 필요 없는 Microsoft Learn MCP(https://learn.microsoft.com/api/mcp)에 연결해, async with 안에서 에이전트가 공식 문서를 검색해 출처와 함께 답하도록 tools로 연결하고 stream_agent로 출력해줘.
+```
+
+**6. RAG — Azure AI Search 하이브리드** → `src/06_rag_agent.py`
+
+```text
+> src/06_rag_agent.py를 만들어줘. Azure AI Search 하이브리드(키워드+벡터) 검색으로 지식 베이스를 찾아 컨텍스트로 주입한 뒤 에이전트가 근거 기반으로 답하게 하고, 인덱스 생성·임베딩 업로드까지 멱등하게 자체 처리해줘. 임베딩은 Azure OpenAI, 인증은 키리스(AzureCliCredential)로.
+```
+
+**7. RAG (Foundry IQ 변형) — agentic retrieval** → `src/06_rag_agent_foundry_iq.py`
+
+```text
+> src/06_rag_agent_foundry_iq.py를 만들어줘. 06번과 같은 지식 베이스를 Foundry IQ(지식 베이스 + agentic retrieval)에 올리고, 검색을 직접 코딩하는 대신 AzureAISearchContextProvider(agentic 모드)에 위임해 멀티홉 검색 결과가 before_run 훅으로 자동 주입되게 해줘. 공용 로직은 _rag_iq.py로 분리해줘.
+```
+
+> 🔍 생성 후에는 `/diff`로 변경을 확인하고 `copilot --agent reviewer`로 규칙(import 경로 · async ·
+> 스트리밍 · 한국어 `instructions`) 준수를 검토하세요. 바이브 코딩 흐름은
+> [실습 5. 바이브 코딩](#실습-5-바이브-코딩--설정만으로-코드-생성리뷰)에서 자세히 다룹니다.
 
 ---
 
