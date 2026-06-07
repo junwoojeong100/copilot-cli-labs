@@ -498,6 +498,9 @@ python3 -m py_compile src/04_concurrent_workflow.py   # 오류 없으면 아무 
 | **1회 지연 실행** | `/after 30m <프롬프트>` | 지정 시간 뒤 한 번 실행 |
 | **세션 재개** | `copilot --continue` / `/resume` | 직전/특정 세션을 컨텍스트째 이어서 |
 
+> ℹ️ `/every`·`/after`(스케줄)·`/sandbox`는 공식 문서에 있으나 CLI 버전에 따라 노출이 다를 수
+> 있습니다 — 현재 버전 지원 여부는 세션에서 `/help`로 확인하세요.
+
 ```text
 > /plan
 > 새 RAG 예제를 추가하는 작업을 단계로 나눠줘
