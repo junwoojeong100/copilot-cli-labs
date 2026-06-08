@@ -29,7 +29,7 @@
 | **GitHub PAT** | 선택 | `github` MCP·이슈/PR 작업 시 (실습 4) | <https://github.com/settings/tokens> |
 | **GitHub CLI(`gh`)** | 선택 | 커밋·PR 실습 시 (실습 7) | `gh auth login` · <https://cli.github.com> |
 | **Azure CLI** | 선택 | `azure` MCP 서버 인증 시 (실습 4) | `az version` → `az login` |
-| **Python 3** | 선택 | 생성 코드 문법 검증 (실습 5) | `python3 --version` |
+| **Python 3.14.5** | 선택 | 생성 코드 문법 검증 (실습 5) | `python3 --version` |
 
 > 💡 **선택 항목은 없어도 완주할 수 있습니다.** PAT·Azure·Python 없이도 인증이 필요 없는
 > `microsoftLearn` MCP 서버와 `/diff`·`reviewer` 검토만으로 모든 실습을 따라갈 수 있습니다.
