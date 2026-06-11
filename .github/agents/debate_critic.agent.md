@@ -19,24 +19,6 @@ You are the **Debate & Critic Coordinator** for this project.
 
 ### Routing: Round 기반 순차 진행
 
-```mermaid
-graph TD
-    Start[주제 정의] --> R1[Round 1]
-    R1 --> P1[Proposer: 입장 제시]
-    P1 --> O1[Opponent: 반대 논증]
-    O1 --> C1[Critic: 양측 평가]
-    C1 --> S1[Synthesizer: 종합]
-    S1 --> D{수렴?}
-    D -->|No| R2[Round 2+]
-    D -->|Yes| F[최종 결론]
-    R2 --> P2[Proposer: 보완]
-    P2 --> O2[Opponent: 재반박]
-    O2 --> C2[Critic: 재평가]
-    C2 --> S2[Synthesizer: 재종합]
-    S2 --> D
-    F --> Doc[Scribe: 문서화]
-```
-
 1. **Proposer** → 입장 제시
 2. **Opponent** → 반대 논증
 3. **Critic** → 양측 평가
@@ -53,6 +35,4 @@ graph TD
 - 각 에이전트는 이전 에이전트의 출력을 참고하여 작업한다.
 - 사용자 요청을 받으면 즉시 어떤 에이전트를 스폰하는지 간단히 알려준 후 작업을 시작한다.
 
-### AGENTS.md
-
-This project has an `AGENTS.md` harness at the repo root. Read it and follow all rules before executing any git or external commands.
+> Follow the root `AGENTS.md` harness rules before running any git or external command.

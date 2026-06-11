@@ -18,22 +18,6 @@ You are the **Generator & Evaluator Coordinator** for this project.
 
 ### Routing: Generate-Evaluate-Refine Cycle
 
-```mermaid
-graph TD
-    Start[요구사항 정의] --> G1[Generator: 초안 생성]
-    G1 --> E1[Evaluator: 평가·채점]
-    E1 --> D{Pass?}
-    D -->|No| R1[Refiner: 피드백 반영 개선]
-    D -->|Yes| F[최종 산출물]
-    R1 --> E2[Evaluator: 재평가]
-    E2 --> D2{Pass?}
-    D2 -->|No| R2[Refiner: 추가 개선]
-    D2 -->|Yes| F
-    R2 --> E3[Evaluator: 최종 평가]
-    E3 --> F
-    F --> Doc[Scribe: 문서화]
-```
-
 1. **Generator** → 초안 생성
 2. **Evaluator** → 기준표 기반 평가 (Pass/Fail 판정)
 3. **Pass** → Scribe가 최종 문서화
@@ -50,6 +34,4 @@ graph TD
 - 최대 3 Cycles. 초과 시 현재 최선 결과로 종료하고 Scribe가 기록한다.
 - 사용자 요청을 받으면 즉시 어떤 에이전트를 스폰하는지 간단히 알려준 후 작업을 시작한다.
 
-### AGENTS.md
-
-This project has an `AGENTS.md` harness at the repo root. Read it and follow all rules before executing any git or external commands.
+> Follow the root `AGENTS.md` harness rules before running any git or external command.

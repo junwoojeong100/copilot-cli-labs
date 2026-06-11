@@ -6,27 +6,18 @@ applyTo: "**/*.py"
 
 ## 가상환경 설정
 
-- Python 3.14.5 기반 `.venv` 가상환경을 사용한다.
-- 권장 버전은 Python 3.14.5이다.
-- 가상환경 생성 및 활성화:
+- Python 3.14.5 기반 `.venv` 가상환경을 사용한다 (`.venv/`는 `.gitignore`로 버전 관리에서 제외).
+- 생성·활성화 후 가상환경 안에서 패키지를 설치한다:
   ```bash
   python -m venv .venv
-  source .venv/bin/activate   # macOS / Linux
-  # .venv\Scripts\activate    # Windows
-  ```
-- 패키지 설치는 가상환경 활성화 후 진행한다:
-  ```bash
+  source .venv/bin/activate   # macOS/Linux (Windows: .venv\Scripts\activate)
   pip install -r requirements.txt
   ```
-- `.venv/` 디렉토리는 `.gitignore`에 포함하여 버전 관리에서 제외한다.
 
 ## 의존성 관리
 
-- 프로젝트 의존성은 `requirements.txt`에 명시한다.
-- 새 패키지를 추가하면 `requirements.txt`를 갱신한다.
-- **SDK·핵심 패키지는 `==` 또는 `>=x,<y` 형태로 버전을 명시한다.**
-- **프리릴리스 패키지는 `>=` 형태의 최소 버전 지정도 허용한다.**
-- 일반 라이브러리를 추가할 때도 버전 범위를 명시해 재현 가능성을 유지한다.
+- 의존성은 `requirements.txt`에 명시하고, 패키지를 추가하면 갱신한다.
+- 재현성을 위해 버전을 명시한다: SDK·핵심 패키지는 `==` 또는 `>=x,<y`, 프리릴리스는 `>=` 최소 버전 지정도 허용.
 
 ## 코드 컨벤션
 

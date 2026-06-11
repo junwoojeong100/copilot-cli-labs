@@ -13,8 +13,7 @@
 3. **GroupChat 워크플로우** (`03_group_chat.py`) — 여러 에이전트가 협업 토론
 4. **동시(Concurrent) 워크플로우** (`04_concurrent_workflow.py`) — 여러 전문가가 병렬 검토
 5. **MCP 도구 연동** (`05_mcp_agent.py`) — `MCPStreamableHTTPTool`로 외부 시스템 호출
-6. **RAG** (`06_rag_agent.py`, `06_rag_agent_foundry_iq.py`) — 검색 증강 생성
-   (기본 버전과 Foundry IQ 버전 2가지 변형 제공)
+6. **RAG** (`06_rag_agent.py`, `06_rag_agent_foundry_iq.py`) — 검색 증강 생성 (기본 + Foundry IQ 변형)
 
 ## 기술 스택
 
@@ -27,16 +26,12 @@
 
 ## 프로젝트 코드 패턴
 
-코드 생성 시 이 프로젝트의 기존 패턴을 따른다:
+코드 생성 시 기존 패턴을 따른다 (상세 API는 `agent-framework-codegen` 스킬 참조):
 
-- Chat 클라이언트는 `FoundryChatClient(project_endpoint=..., model=..., credential=...)`로 생성 (키워드 인자)
-- 에이전트는 `Agent(client=client, name=..., instructions=...)`로 생성하고(모든 인자 키워드 형태), 역할은 `instructions`로 부여
-- Sequential은 `SequentialBuilder(participants=[...]).build()`로 순차 파이프라인 구성
-- GroupChat은 `GroupChatBuilder(participants=..., selection_func=..., max_rounds=...).build()`
-- Concurrent는 `ConcurrentBuilder(participants=[...]).build()`로 병렬 검토 구성
-- 모든 진입점은 `if __name__ == "__main__": asyncio.run(main())`
-- 환경변수는 `load_dotenv`로 로드하고, `PROJECT_ENDPOINT` 누락 시 친절한 오류 후 종료
-- 새 예제는 `src/`에 `NN_<name>.py` 규칙으로 추가한다
+- 클라이언트·에이전트는 키워드 인자로 생성: `FoundryChatClient(project_endpoint=..., model=..., credential=...)`, `Agent(client=..., name=..., instructions=...)` (역할은 `instructions`로 부여)
+- 오케스트레이션: `SequentialBuilder(participants=[...])`, `GroupChatBuilder(participants=..., selection_func=..., max_rounds=...)`, `ConcurrentBuilder(participants=[...])` 뒤에 `.build()`
+- 진입점은 `if __name__ == "__main__": asyncio.run(main())`, 환경변수는 `load_dotenv`로 로드하고 `PROJECT_ENDPOINT` 누락 시 친절한 오류 후 종료
+- 새 예제는 `src/`에 `NN_<name>.py` 규칙으로 추가
 
 ## Agent Framework 코드 생성
 
