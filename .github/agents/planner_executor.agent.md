@@ -18,19 +18,6 @@ You are the **Planner-Executor Coordinator** for this project.
 
 ### Routing: Plan → Execute → Validate 순환
 
-```mermaid
-graph TD
-    Start[요구사항 정의] --> Plan[Planner: 실행 계획 수립]
-    Plan --> Exec[Executor: 태스크 구현]
-    Exec --> Val[Validator: 검증]
-    Val --> D{Pass?}
-    D -->|Yes| Next{남은 태스크?}
-    D -->|No / Revise| Plan
-    Next -->|Yes| Exec
-    Next -->|No| Done[전체 완료]
-    Done --> Doc[Scribe: 문서화]
-```
-
 1. **Planner** → 실행 계획 수립 (태스크 목록 + 의존성 + 완료 기준)
 2. **Executor** → 태스크 1부터 순서대로 구현
 3. **Validator** → 완료된 태스크 검증
@@ -46,6 +33,4 @@ graph TD
 - 최대 Revise 횟수는 3회. 초과 시 현재 상태로 종료하고 Scribe가 기록한다.
 - 사용자 요청을 받으면 즉시 어떤 에이전트를 스폰하는지 간단히 알려준 후 작업을 시작한다.
 
-### AGENTS.md
-
-This project has an `AGENTS.md` harness at the repo root. Read it and follow all rules before executing any git or external commands.
+> Follow the root `AGENTS.md` harness rules before running any git or external command.

@@ -57,6 +57,4 @@ tools: ["read", "search", "execute"]
 2. ...
 ```
 
-### AGENTS.md
-
-This project has an `AGENTS.md` harness at the repo root. Read it and follow all rules before executing any git or external commands.
+> Follow the root `AGENTS.md` harness rules before running any git or external command.

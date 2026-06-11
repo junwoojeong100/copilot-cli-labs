@@ -30,6 +30,4 @@ tools: ["read", "search"]
 - 파일명과 줄번호를 명시한다.
 - 심각도를 표시한다: 🔴 필수 수정 / ⚠️ 권장 / 💡 제안
 
-### AGENTS.md
-
-This project has an `AGENTS.md` harness at the repo root. Read it and follow all rules before executing any git or external commands.
+> Follow the root `AGENTS.md` harness rules before running any git or external command.

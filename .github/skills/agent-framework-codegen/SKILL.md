@@ -304,12 +304,9 @@ result = await agent.run(augmented)          # 3) 생성
 |------|-------------|
 | `PROJECT_ENDPOINT 환경 변수를 설정해주세요` | 루트 `.env` 작성 + `load_dotenv` 경로 확인 |
 | 인증 실패 | `az login` 재실행, `az account set`으로 구독 선택 |
-| 의도치 않은 handoff 경로가 보임 | 기본 mesh topology 적용 상태 — 필요한 경로만 허용하려면 `add_handoff(from, [to...])`로 제한 |
 | `400 Invalid 'tools[0].name'` (handoff) | Agent `name`에 한글/공백 사용 — handoff 도구명은 ASCII(`^[a-zA-Z0-9_.-]+$`)만 허용. name을 영문으로 변경 |
 | Handoff `build()`가 `ValueError`(persistence) | 일부 Agent에 `require_per_service_call_history_persistence=True` 누락 — 모든 참여 Agent에 지정 |
 | GroupChat이 끝나지 않음 | `max_rounds` 또는 `termination_condition` 미설정 |
 | GroupChat 결과가 종료 메시지만 나옴 | `get_outputs()`는 종료 메시지만 반환 — 토론 내용은 이벤트의 `AgentExecutorResponse`에서 추출 |
 | `WorkflowBuilder` `Case` 조건이 항상 첫 케이스로만 분기됨 | 조건은 **순서대로 평가**되며 첫 번째 `True`에서 멈춤 — 조건 순서를 좁은 것부터 배치할 것 |
-| MCP 도구를 호출하지 않음 | `tools=` 전달 누락, 또는 `async with mcp_tool:` 밖에서 실행 |
-| RAG가 엉뚱한 답을 함 | 검색 결과가 빈약하거나 "문서 밖 추측 금지" 지시문 누락 |
 | `ImportError: agent_framework...` | `pip install -U agent-framework`, 가상환경 활성화 확인 |
