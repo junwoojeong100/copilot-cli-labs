@@ -15,11 +15,7 @@
 
 ## Harness Rules
 
-### Rule 1: 기능 브랜치 push 허용 / 보호 브랜치 push 절대 금지
-
-| 항목 | 내용 |
-|------|------|
-| **상태** | 🟡 조건부 허용 (Conditional) |
+### Rule 1: 기능 브랜치 push 허용 / 보호 브랜치 push 절대 금지 — 🟡 조건부 허용
 
 #### 허용되는 명령어
 
@@ -57,36 +53,21 @@ git push --tags          # 태그는 사용자가 직접 푼다
 
 #### 이유
 
-1. **Human Review 보장** — 보호 브랜치에는 반드시 PR + 리뷰를 거쳐 반영한다
-2. **Protected Branch 보호** — 에이전트가 실수로 보호 브랜치를 덮어쓰는 사고를 원천 차단한다
-3. **히스토리 무결성** — force push는 공유 히스토리를 손상시킬 수 있어 전면 금지한다
-4. **감사 추적** — 모든 보호 브랜치 반영은 PR로 남아 변경 이력과 승인 기록이 유지된다
+보호 브랜치는 PR + 리뷰로만 반영해 Human Review·히스토리 무결성·감사 추적을 보장하고,
+에이전트가 실수로 보호 브랜치를 덮어쓰거나 force push로 공유 히스토리를 손상시키는 사고를 차단한다.
 
 #### 표준 워크플로우
 
 ```bash
-# ✅ 허용되는 워크플로우
 git checkout -b feat/my-change
-git add .
-git commit -m "feat: describe the change in English"
+git add . && git commit -m "feat: describe the change in English"
 git push -u origin feat/my-change
-gh pr create --draft --base main --title "PR title in English" --body "PR description in English"
-
-# ❌ 절대 금지 (보호 브랜치 직접 push)
-git checkout main
-git push origin main
-
-# ❌ 절대 금지 (force push)
-git push --force-with-lease origin feat/my-change
+gh pr create --draft --base main --title "PR title in English" --body "..."
 ```
 
 ---
 
-### Rule 2: 커밋 메시지는 영문으로 작성
-
-| 항목 | 내용 |
-|------|------|
-| **상태** | 🟢 필수 (Mandatory) |
+### Rule 2: 커밋 메시지는 영문으로 작성 — 🟢 필수
 
 - 모든 `git commit` 메시지(제목·본문)는 **영문**으로 작성한다.
 - [Conventional Commits](https://www.conventionalcommits.org/) 스타일(`feat:`, `fix:`, `docs:`,
@@ -105,11 +86,7 @@ git commit -m "환불 에이전트 추가"
 
 ---
 
-### Rule 3: PR은 항상 `main` 브랜치를 대상으로 생성
-
-| 항목 | 내용 |
-|------|------|
-| **상태** | 🟢 필수 (Mandatory) |
+### Rule 3: PR은 항상 `main` 브랜치를 대상으로 생성 — 🟢 필수
 
 - 모든 PR은 **`main` 브랜치를 base로 생성**한다 (`--base main`을 명시적으로 지정).
 - PR은 기본적으로 **Draft(`--draft`)로 생성**하여 사람의 리뷰·승인을 전제로 한다.
@@ -125,9 +102,5 @@ gh pr create --draft --base main \
 
 ## 위반 시 처리
 
-| 단계 | 조치 |
-|------|------|
-| **감지** | 에이전트 출력 로그에서 금지 명령어 실행 여부를 확인한다 |
-| **즉시 중단** | 위반이 감지되면 해당 에이전트의 작업을 즉시 중단한다 |
-| **보고** | 위반 내용을 사용자에게 알린다 |
-| **복구** | 필요 시 `git reset`, `git revert` 등으로 상태를 복구한다 |
+금지 명령어 실행이 감지되면 해당 에이전트의 작업을 **즉시 중단**하고 사용자에게 **보고**한 뒤,
+필요 시 `git reset`·`git revert` 등으로 상태를 **복구**한다.
